@@ -1,4 +1,4 @@
-
+﻿
 /* ==========================================================================
    CLEAN HERO BANNER STAGE (NO GHOST TEXT CLASH)
    ========================================================================== */
@@ -1865,41 +1865,60 @@ header {
 
 /* Recruiter Print & ATS Export Stylesheet */
 @media print {
-    body {
+    body, html {
         background: #ffffff !important;
-        color: #000000 !important;
+        color: #111827 !important;
+        overflow: visible !important;
     }
-    #neuralCanvas, .top-banner, header, .hero-section, .about-section, .skills-section, .projects-section, .experience-section, .certs-section, .contact-section, .site-footer, .toast, .back-to-top, .modal-header, .ambient-glow {
+    #neuralCanvas, .top-banner, header, nav, .site-nav, .hero-section, .about-section, .skills-section, .projects-section, .experience-section, .certs-section, .contact-section, .site-footer, .toast, .back-to-top, .modal-header, .modal-control-bar, .modal-actions-wrap, .modal-close-btn, .floating-quick-pill, .floating-resume-btn, .ambient-glow {
         display: none !important;
     }
     .modal-overlay {
         position: static !important;
+        display: block !important;
         background: transparent !important;
         opacity: 1 !important;
         visibility: visible !important;
         padding: 0 !important;
+        margin: 0 !important;
     }
     .modal-box {
         max-width: 100% !important;
+        width: 100% !important;
         max-height: none !important;
         box-shadow: none !important;
         border: none !important;
         background: #ffffff !important;
-        color: #000000 !important;
-    }
-    .ats-content {
-        color: #111111 !important;
+        color: #111827 !important;
         padding: 0 !important;
+        margin: 0 !important;
     }
-    .ats-header-block h2 {
+    .modal-resume-body, #printableResume, .ats-content {
+        background: #ffffff !important;
+        color: #111827 !important;
+        padding: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    .ats-header, .ats-section, .ats-entry {
+        color: #111827 !important;
+    }
+    .ats-name {
         color: #000000 !important;
     }
-    .ats-tagline, .ats-section h3 {
+    .ats-title, .ats-contact-line, .ats-links-line, .ats-entry-sub, .ats-entry-detail, .ats-bullets {
+        color: #334155 !important;
+    }
+    .ats-section-title {
         color: #0f172a !important;
-        border-color: #cbd5e1 !important;
+        border-bottom: 2px solid #cbd5e1 !important;
     }
-    .job-line {
+    .ats-bold {
         color: #000000 !important;
+    }
+    a {
+        text-decoration: none !important;
+        color: #0284c7 !important;
     }
 }
 

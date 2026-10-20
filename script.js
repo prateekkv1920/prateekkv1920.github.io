@@ -1,4 +1,4 @@
-/**
+﻿/**
  * PRATEEK KV - MASTER PORTFOLIO INTERACTION ENGINE
  * Zero-dependency, performant, modern vanilla JavaScript
  */
@@ -30,10 +30,27 @@ function closeResumeModalOnBackdrop(event) {
 window.closeResumeModalOnBackdrop = closeResumeModalOnBackdrop;
 
 
-function downloadAtsResumeText() {
-    var atsEl = document.querySelector('.ats-content');
-    if (!atsEl) return;
-    var rawText = atsEl.innerText;
+function printAtsResume() {
+    var modal = document.getElementById('resumeModal') || document.getElementById('resumeModalBackdrop');
+    if (modal && !modal.classList.contains('active')) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    window.print();
+}
+window.printAtsResume = printAtsResume;
+
+function downloadAtsText() {
+    var resumeEl = document.getElementById('printableResume') || document.querySelector('.modal-resume-body') || document.querySelector('.ats-content');
+    if (!resumeEl) {
+        console.error("Resume content element not found.");
+        return;
+    }
+    var rawText = (resumeEl.innerText || resumeEl.textContent || '')
+        .replace(/\r\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
     var blob = new Blob([rawText], { type: 'text/plain;charset=utf-8' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -42,12 +59,14 @@ function downloadAtsResumeText() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+
     if (typeof showToast === 'function') {
         showToast('ATS Resume (.txt) downloaded successfully!');
     }
 }
-window.downloadAtsResumeText = downloadAtsResumeText;
+window.downloadAtsText = downloadAtsText;
+window.downloadAtsResumeText = downloadAtsText;
 
 window.openResumeModal = openResumeModal;
 window.closeResumeModal = closeResumeModal;
