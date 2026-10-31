@@ -721,3 +721,117 @@ function initScrollytellingTracker() {
 document.addEventListener('DOMContentLoaded', () => {
     initScrollytellingTracker();
 });
+
+// ==========================================================================
+// NIGHT / LIGHT MODE THEME ENGINE
+// ==========================================================================
+function initThemeToggle() {
+    const savedTheme = localStorage.getItem('prateek_theme');
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    const themeIcon = document.getElementById('themeIcon');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+    if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+        document.body.classList.add('light-theme');
+        if (themeIcon) {
+            themeIcon.className = 'fas fa-moon';
+        }
+    } else {
+        document.body.classList.remove('light-theme');
+        if (themeIcon) {
+            themeIcon.className = 'fas fa-sun';
+        }
+    }
+
+    if (themeToggleBtn) {
+        themeToggleBtn.setAttribute('title', document.body.classList.contains('light-theme') ? 'Switch to Night Mode' : 'Switch to Light Mode');
+    }
+}
+
+function toggleTheme() {
+    const isLight = document.body.classList.toggle('light-theme');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+    if (isLight) {
+        localStorage.setItem('prateek_theme', 'light');
+        if (themeIcon) themeIcon.className = 'fas fa-moon';
+        if (themeToggleBtn) themeToggleBtn.setAttribute('title', 'Switch to Night Mode');
+        showToast('☀️ Day Mode activated: High contrast reading layout');
+    } else {
+        localStorage.setItem('prateek_theme', 'dark');
+        if (themeIcon) themeIcon.className = 'fas fa-sun';
+        if (themeToggleBtn) themeToggleBtn.setAttribute('title', 'Switch to Light Mode');
+        showToast('🌙 Night Mode activated: Midnight obsidian theme');
+    }
+}
+window.toggleTheme = toggleTheme;
+
+
+// ==========================================================================
+// INTERACTIVE 3D CARD TILT ENGINE
+// ==========================================================================
+function init3DCardTilt() {
+    const cards = document.querySelectorAll('.tilt-card');
+    if (!cards.length) return;
+
+    cards.forEach(card => {
+        let isHovered = false;
+
+        card.addEventListener('mouseenter', () => {
+            isHovered = true;
+            card.style.transition = 'transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease';
+        });
+
+        card.addEventListener('mousemove', (e) => {
+            if (!isHovered) return;
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Maximum tilt angle of 7 degrees for subtle luxury feel
+            const rotateX = ((y - centerY) / centerY) * -7;
+            const rotateY = ((x - centerX) / centerX) * 7;
+
+            card.style.transform = 'perspective(1100px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg) translateZ(6px) scale3d(1.015, 1.015, 1.015)';
+        });
+
+        card.addEventListener('mouseleave', () => {
+            isHovered = false;
+            card.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease';
+            card.style.transform = 'perspective(1100px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale3d(1, 1, 1)';
+        });
+    });
+}
+
+
+// ==========================================================================
+// SCROLLYTELLING SLIDING NARRATIVE ANIMATIONS
+// ==========================================================================
+function initScrollytellingSliding() {
+    const storyCards = document.querySelectorAll('.story-act-card');
+    if (!storyCards.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+            }
+        });
+    }, {
+        threshold: 0.15,
+        rootMargin: "0px 0px -60px 0px"
+    });
+
+    storyCards.forEach(card => observer.observe(card));
+}
+
+
+// Ensure all functions initialize on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    initThemeToggle();
+    init3DCardTilt();
+    initScrollytellingSliding();
+});
