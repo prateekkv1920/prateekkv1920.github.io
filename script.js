@@ -835,3 +835,65 @@ document.addEventListener('DOMContentLoaded', () => {
     init3DCardTilt();
     initScrollytellingSliding();
 });
+
+
+// ==========================================================================
+// UNIFIED MASTERCLASS STORY NAVIGATION & SCROLL TRACKER
+// ==========================================================================
+function jumpToStoryAct(actNum) {
+    const actEl = document.getElementById('act-' + actNum);
+    if (actEl) {
+        const offset = 80;
+        const bodyRect = document.body.getBoundingClientRect().top;
+        const elementRect = actEl.getBoundingClientRect().top;
+        const elementPosition = elementRect - bodyRect;
+        const offsetPosition = elementPosition - offset;
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
+    }
+
+    const pills = document.querySelectorAll('.story-nav-pill');
+    pills.forEach((p, idx) => {
+        p.classList.toggle('active', idx + 1 === actNum);
+    });
+
+    const progressBar = document.getElementById('storyNavProgress');
+    if (progressBar) {
+        progressBar.style.width = (actNum * 20) + '%';
+    }
+}
+window.jumpToStoryAct = jumpToStoryAct;
+
+function initUnifiedStoryObserver() {
+    const acts = [1, 2, 3, 4, 5].map(n => document.getElementById('act-' + n)).filter(Boolean);
+    const pills = document.querySelectorAll('.story-nav-pill');
+    const progressBar = document.getElementById('storyNavProgress');
+    if (!acts.length || !pills.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                const actNum = parseInt(id.replace('act-', ''), 10);
+                pills.forEach((p, idx) => {
+                    p.classList.toggle('active', idx + 1 === actNum);
+                });
+                if (progressBar) {
+                    progressBar.style.width = (actNum * 20) + '%';
+                }
+            }
+        });
+    }, {
+        threshold: 0.3,
+        rootMargin: "-90px 0px -30% 0px"
+    });
+
+    acts.forEach(act => observer.observe(act));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initUnifiedStoryObserver();
+});
