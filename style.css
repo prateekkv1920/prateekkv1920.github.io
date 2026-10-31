@@ -3852,14 +3852,14 @@ body.light-theme .site-footer {
 
 /* Scrollytelling Sliding Narrative Transitions */
 .story-act-card {
-    opacity: 0;
-    transform: translateY(40px) scale(0.98);
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease !important;
 }
 
 .story-act-card.in-view {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
 }
 
 
@@ -3987,4 +3987,390 @@ body.light-theme .site-footer {
         font-size: 0.8rem;
         gap: 6px;
     }
+}
+
+
+/* ==========================================================================
+   MASTERCLASS LIGHT THEME OVERRIDES (CRISP WCAG AAA CONTRAST & ZERO FAINT TEXT)
+   ========================================================================== */
+
+body.light-theme {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .act-title {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+body.light-theme .story-p {
+    color: #334155 !important;
+    font-size: 1.05rem !important;
+    line-height: 1.8 !important;
+}
+
+body.light-theme .story-p.lead-p {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    font-size: 1.16rem !important;
+    line-height: 1.75 !important;
+}
+
+body.light-theme .story-p strong {
+    color: #0284c7 !important;
+    font-weight: 700 !important;
+}
+
+body.light-theme .story-p em {
+    color: #0369a1 !important;
+    font-style: italic !important;
+}
+
+body.light-theme .story-quote-card {
+    background: #f0fdf4 !important;
+    border-left: 4px solid #0284c7 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03) !important;
+}
+
+body.light-theme .story-quote-card .quote-mark {
+    color: #0284c7 !important;
+}
+
+body.light-theme .story-quote-card .quote-text {
+    color: #0f172a !important;
+    font-weight: 500 !important;
+}
+
+body.light-theme .act-location {
+    color: #475569 !important;
+    font-weight: 500 !important;
+}
+
+body.light-theme .act-location i {
+    color: #0284c7 !important;
+}
+
+body.light-theme .act-tag {
+    background: #e0f2fe !important;
+    border: 1px solid #7dd3fc !important;
+    color: #0284c7 !important;
+}
+
+body.light-theme .act-roman {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+body.light-theme .profile-story-spotlight {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme .spotlight-overlay {
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0) 100%) !important;
+}
+
+body.light-theme .spotlight-overlay h4 {
+    color: #ffffff !important;
+}
+
+body.light-theme .spotlight-overlay span {
+    color: #38bdf8 !important;
+}
+
+body.light-theme .milestone-pill {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+
+body.light-theme .milestone-pill i {
+    color: #059669 !important;
+}
+
+body.light-theme .architecture-story-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme .arch-card-header {
+    color: #0284c7 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+body.light-theme .arch-node {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+
+body.light-theme .arch-node.highlight {
+    background: #e0f2fe !important;
+    border-color: #7dd3fc !important;
+    color: #0284c7 !important;
+}
+
+body.light-theme .arch-node.security {
+    background: #ecfdf5 !important;
+    border-color: #6ee7b7 !important;
+    color: #059669 !important;
+}
+
+body.light-theme .arch-connector {
+    color: #0284c7 !important;
+}
+
+body.light-theme .story-banner-frame {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme .banner-glass-overlay {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+body.light-theme .g-badge {
+    background: #e0f2fe !important;
+    color: #0284c7 !important;
+    border-color: #7dd3fc !important;
+}
+
+body.light-theme .g-badge-sub {
+    color: #475569 !important;
+}
+
+body.light-theme .banner-credo {
+    color: #334155 !important;
+}
+
+body.light-theme .mentorship-metrics-box {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body.light-theme .mm-num {
+    color: #0284c7 !important;
+}
+
+body.light-theme .mm-desc {
+    color: #475569 !important;
+}
+
+body.light-theme .mm-desc strong {
+    color: #0f172a !important;
+}
+
+body.light-theme .crucible-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-theme .crucible-card h4 {
+    color: #0f172a !important;
+}
+
+body.light-theme .crucible-card p {
+    color: #475569 !important;
+}
+
+body.light-theme .endorsement-card-story {
+    background: #ffffff !important;
+    border: 1px solid #6ee7b7 !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-theme .endorsement-header {
+    color: #059669 !important;
+}
+
+body.light-theme .end-quote {
+    color: #1e293b !important;
+}
+
+body.light-theme .end-signature strong {
+    color: #0f172a !important;
+}
+
+body.light-theme .end-signature span {
+    color: #64748b !important;
+}
+
+body.light-theme .story-nav-pill {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+}
+
+body.light-theme .story-nav-pill.active {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    border-color: #0284c7 !important;
+}
+
+body.light-theme .story-nav-pill.active .nav-act-num,
+body.light-theme .story-nav-pill.active .nav-act-title {
+    color: #ffffff !important;
+}
+
+body.light-theme .nav-act-num {
+    color: #0284c7 !important;
+    font-weight: 700 !important;
+}
+
+body.light-theme .nav-act-title {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+
+body.light-theme .project-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body.light-theme .project-title,
+body.light-theme .project-card-title {
+    color: #0f172a !important;
+}
+
+body.light-theme .project-desc,
+body.light-theme .project-card-desc {
+    color: #475569 !important;
+}
+
+body.light-theme .skill-group-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body.light-theme .skill-group-title {
+    color: #0f172a !important;
+}
+
+body.light-theme .skill-pill {
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .skill-pill span,
+body.light-theme .skill-name {
+    color: #0f172a !important;
+}
+
+body.light-theme .exp-card,
+body.light-theme .cert-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body.light-theme .exp-role,
+body.light-theme .cert-title {
+    color: #0f172a !important;
+}
+
+body.light-theme .exp-org,
+body.light-theme .cert-org {
+    color: #0284c7 !important;
+}
+
+body.light-theme .exp-period,
+body.light-theme .cert-id {
+    color: #64748b !important;
+}
+
+body.light-theme .exp-bullet,
+body.light-theme .exp-bullets li {
+    color: #334155 !important;
+}
+
+body.light-theme .contact-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body.light-theme .contact-title {
+    color: #0f172a !important;
+}
+
+body.light-theme .c-label {
+    color: #64748b !important;
+}
+
+body.light-theme .c-value {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+
+body.light-theme .form-group label {
+    color: #1e293b !important;
+}
+
+body.light-theme .form-input,
+body.light-theme .form-textarea {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .modal-window {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .modal-header {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+body.light-theme .modal-body,
+body.light-theme .modal-resume-body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .ats-name {
+    color: #0f172a !important;
+}
+
+body.light-theme .ats-title {
+    color: #0284c7 !important;
+}
+
+body.light-theme .ats-contact-line,
+body.light-theme .ats-links-line {
+    color: #475569 !important;
+}
+
+body.light-theme .ats-section-title {
+    color: #0f172a !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+}
+
+body.light-theme .ats-bold {
+    color: #0f172a !important;
+}
+
+body.light-theme .ats-entry-detail,
+body.light-theme .ats-bullets li {
+    color: #334155 !important;
+}
+
+body.light-theme .floating-quick-pill {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(2, 132, 199, 0.35) !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15) !important;
+}
+
+body.light-theme .quick-pill-btn {
+    color: #0f172a !important;
 }
