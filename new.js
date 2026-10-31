@@ -1,5 +1,5 @@
-﻿// new.js
-console.log("Prateek KV Portfolio Engine Initialized.");
+﻿// new.js - Prateek KV Portfolio Engine
+console.log("%cPrateek KV Engine Loaded.", "color: #00f0ff; font-weight: bold;");
 
 // Safety definitions for ATS Resume Modal actions
 if (typeof window.printAtsResume !== 'function') {
@@ -15,9 +15,11 @@ if (typeof window.printAtsResume !== 'function') {
 
 if (typeof window.downloadAtsText !== 'function') {
     window.downloadAtsText = function() {
+        window.__allowDownloadText = true;
         var resumeEl = document.getElementById('printableResume') || document.querySelector('.modal-resume-body') || document.querySelector('.ats-content');
         if (!resumeEl) {
             console.error("Resume content element not found.");
+            window.__allowDownloadText = false;
             return;
         }
         var rawText = (resumeEl.innerText || resumeEl.textContent || '')
@@ -33,7 +35,10 @@ if (typeof window.downloadAtsText !== 'function') {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+        setTimeout(function() { 
+            URL.revokeObjectURL(url); 
+            window.__allowDownloadText = false;
+        }, 1000);
 
         if (typeof showToast === 'function') {
             showToast('ATS Resume (.txt) downloaded successfully!');

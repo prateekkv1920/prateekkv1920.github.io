@@ -112,8 +112,8 @@ function initNeuralCanvas() {
     function Particle() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.7;
-        this.vy = (Math.random() - 0.5) * 0.7;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
         this.radius = Math.random() * 2 + 1.2;
     }
 
@@ -554,4 +554,170 @@ function initStoryObserver() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initStoryObserver();
+});
+
+
+// ==========================================================================
+// ADVANCED SECURITY & CONTENT PROTECTION ENGINE
+// ==========================================================================
+function showSecurityToast(msg) {
+    let toast = document.getElementById('securityToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'securityToast';
+        toast.className = 'security-toast';
+        toast.innerHTML = '<i class="fas fa-shield-alt"></i> <span id="securityToastMsg"></span>';
+        document.body.appendChild(toast);
+    }
+    const msgEl = document.getElementById('securityToastMsg');
+    if (msgEl) msgEl.textContent = msg || 'Content Protected • © Prateek KV. Reproduction restricted.';
+    toast.classList.add('active');
+    clearTimeout(window.__secToastTimer);
+    window.__secToastTimer = setTimeout(() => {
+        toast.classList.remove('active');
+    }, 2800);
+}
+window.showSecurityToast = showSecurityToast;
+
+// Prevent context menu (right click)
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    showSecurityToast('Protected Content: Right-click is disabled to prevent unauthorized copying.');
+    return false;
+});
+
+// Prevent copy, cut, and text drag
+document.addEventListener('copy', function(e) {
+    if (window.__allowDownloadText) return;
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) return;
+    e.preventDefault();
+    showSecurityToast('Protected Material: Direct clipboard copying is restricted.');
+});
+
+document.addEventListener('cut', function(e) {
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) return;
+    e.preventDefault();
+    showSecurityToast('Protected Material: Content cannot be cut.');
+});
+
+document.addEventListener('dragstart', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Prevent DevTools & Source inspect shortcuts
+document.addEventListener('keydown', function(e) {
+    // F12
+    if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        showSecurityToast('Developer tools access restricted on this portfolio.');
+        return false;
+    }
+    // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+        e.preventDefault();
+        showSecurityToast('Inspect Element is restricted on this portfolio.');
+        return false;
+    }
+    // Ctrl+U (View source)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u')) {
+        e.preventDefault();
+        showSecurityToast('Page source viewing is restricted.');
+        return false;
+    }
+    // Ctrl+S (Save page)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'S' || e.key === 's')) {
+        e.preventDefault();
+        showSecurityToast('Page saving is disabled.');
+        return false;
+    }
+    // Ctrl+C (Copy)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'C' || e.key === 'c')) {
+        const activeEl = document.activeElement;
+        if (!activeEl || (activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA')) {
+            e.preventDefault();
+            showSecurityToast('Protected Material: Direct clipboard copying is restricted.');
+            return false;
+        }
+    }
+    // Ctrl+P (Print - guide to resume modal)
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'P' || e.key === 'p')) {
+        const modal = document.getElementById('resumeModal');
+        if (!modal || !modal.classList.contains('active')) {
+            e.preventDefault();
+            showSecurityToast('To print or save PDF, please open the ATS Resume modal.');
+            openResumeModal();
+            return false;
+        }
+    }
+});
+
+// Deterrence Console Watermark
+console.log(
+    '%c🛡️ PRATEEK KV INTELLECTUAL PROPERTY PROTECTED\n%cAll portfolio code, agent designs, and case studies are proprietary. Unauthorized automated extraction, scraping, or copying is strictly monitored.',
+    'color: #00f0ff; font-size: 16px; font-weight: bold; background: #080c14; padding: 10px 14px; border: 1px solid #00f0ff; border-radius: 6px;',
+    'color: #94a3b8; font-size: 12px; margin-top: 6px;'
+);
+
+// Enhanced Scrollytelling Tracker
+function initScrollytellingTracker() {
+    const storySection = document.getElementById('story');
+    const barFill = document.querySelector('.scrolly-bar-fill');
+    const percentEl = document.querySelector('.scrolly-percent');
+    const currentTitleEl = document.querySelector('.scrolly-current-title');
+    const actBadgeEl = document.querySelector('.scrolly-badge');
+
+    const actTitles = {
+        1: "Act I: Kanpur Roots & Data Science",
+        2: "Act II: The Agentic Architect (SQL-GPT)",
+        3: "Act III: GDGoC Organizer & Community Catalyst",
+        4: "Act IV: The Crucible (TEDx & Hackathons)",
+        5: "Act V: Enterprise AI & Internship Vision"
+    };
+
+    if (!storySection) return;
+
+    window.addEventListener('scroll', () => {
+        const rect = storySection.getBoundingClientRect();
+        const winHeight = window.innerHeight;
+        
+        // Compute reading percentage within story section
+        const totalHeight = rect.height - winHeight;
+        if (totalHeight > 0) {
+            let progress = (-rect.top) / totalHeight;
+            progress = Math.max(0, Math.min(1, progress));
+            const pct = Math.round(progress * 100);
+
+            if (barFill) barFill.style.width = pct + '%';
+            if (percentEl) percentEl.textContent = pct + '% Read';
+        }
+    }, { passive: true });
+
+    // Observe each act to update chapter badges
+    const acts = [1, 2, 3, 4, 5].map(n => document.getElementById('act-' + n)).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                const actNum = parseInt(id.replace('act-', ''), 10);
+                if (currentTitleEl && actTitles[actNum]) {
+                    currentTitleEl.textContent = actTitles[actNum];
+                }
+                if (actBadgeEl) {
+                    actBadgeEl.innerHTML = '<i class="fas fa-bookmark"></i> CHAPTER 0' + actNum;
+                }
+            }
+        });
+    }, {
+        threshold: 0.35,
+        rootMargin: "-90px 0px -25% 0px"
+    });
+
+    acts.forEach(act => observer.observe(act));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initScrollytellingTracker();
 });
