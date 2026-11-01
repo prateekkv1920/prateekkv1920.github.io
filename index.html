@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Security Hardening Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; connect-src 'self' https:;">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Prateek KV | AI/ML Engineer, Data Scientist &amp; GDGoC Leader</title>
     
@@ -1397,9 +1402,9 @@
                         <span><i class="fas fa-university"></i> <a href="mailto:prateek_bi@iimtuniversity.com">prateek_bi@iimtuniversity.com</a></span>
                     </div>
                     <div class="ats-links-line">
-                        <a href="https://www.linkedin.com/in/prateek-kv-613822281/" target="_blank">linkedin.com/in/prateek-kv-613822281</a> &bull;
-                        <a href="https://github.com/prateekkv1920" target="_blank">github.com/prateekkv1920 (gitGOAT)</a> &bull;
-                        <a href="https://www.ted.com/profiles/50187164" target="_blank">ted.com/profiles/50187164</a>
+                        <a href="https://www.linkedin.com/in/prateek-kv-613822281/" target="_blank" rel="noopener noreferrer">linkedin.com/in/prateek-kv-613822281</a> &bull;
+                        <a href="https://github.com/prateekkv1920" target="_blank" rel="noopener noreferrer">github.com/prateekkv1920 (gitGOAT)</a> &bull;
+                        <a href="https://www.ted.com/profiles/50187164" target="_blank" rel="noopener noreferrer">ted.com/profiles/50187164</a>
                     </div>
                 </div>
 
@@ -1636,6 +1641,86 @@
         <span class="toast-msg" id="toastMsg">Action completed successfully</span>
     </div>
 
+    
+    <!-- Floating Voice AI Mentor Trigger Button -->
+    <button class="ai-chat-trigger" id="aiChatToggle" onclick="openAiChat()" aria-label="Open Prateek AI Voice Assistant" title="Chat with Prateek's AI Voice Mentor">
+        <div class="ai-avatar-pulse">
+            <img src="profile.jpg?v=new-profile-2" alt="Prateek AI">
+            <span class="ai-status-dot"></span>
+        </div>
+        <span class="ai-trigger-label">
+            <strong>Ask Prateek AI</strong>
+            <small><i class="fas fa-volume-up"></i> Voice Mentor</small>
+        </span>
+    </button>
+
+    <!-- Voice AI Mentor Chat Drawer Dialog -->
+    <div class="ai-chat-drawer" id="aiChatDrawer" role="dialog" aria-modal="true" aria-labelledby="aiChatTitle">
+        <div class="ai-drawer-header">
+            <div class="ai-header-profile">
+                <div class="ai-avatar-wrap">
+                    <img src="profile.jpg?v=new-profile-2" alt="Prateek AI">
+                    <span class="ai-live-indicator"></span>
+                </div>
+                <div class="ai-header-info">
+                    <h3 id="aiChatTitle">Prateek AI <span class="ai-badge-pill">Mentor</span></h3>
+                    <p class="ai-status-sub">
+                        <span class="ai-online-text"><i class="fas fa-circle"></i> Online</span>
+                        <span class="ai-audio-wave" id="aiAudioWave" title="Voice Speaking Indicator">
+                            <span></span><span></span><span></span><span></span>
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <div class="ai-header-controls">
+                <button class="ai-ctrl-btn" id="aiVoiceToggleBtn" onclick="toggleAiVoice()" title="Toggle Voice Audio Output" aria-label="Toggle Voice Audio">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button class="ai-ctrl-btn ai-close-btn" onclick="closeAiChat()" title="Close AI Mentor" aria-label="Close Chat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="ai-chat-body" id="aiChatMessages">
+            <!-- Welcome Intro Message -->
+            <div class="ai-msg-row bot-msg-row">
+                <div class="ai-msg-avatar">
+                    <img src="profile.jpg?v=new-profile-2" alt="Prateek AI">
+                </div>
+                <div class="ai-msg-bubble">
+                    <div class="ai-msg-text">
+                        Hey there! I'm <strong>Prateek's AI Voice Assistant &amp; Engineering Mentor</strong>.<br><br>
+                        Whether you're an engineering recruiter looking into my <strong>multi-agent systems (SQL-GPT)</strong>, or a student wanting mentorship on starting in AI/ML, I'm here to chat with you in real-time.<br><br>
+                        <em>You can type your question or tap the microphone to talk with my voice!</em>
+                    </div>
+                    <div class="ai-msg-actions">
+                        <button class="ai-action-chip" onclick="window.sendAiQuery('Tell me your story &amp; Kanpur roots')">🎙️ The Kanpur Story</button>
+                        <button class="ai-action-chip" onclick="window.sendAiQuery('How does SQL-GPT multi-agent work?')">🤖 SQL-GPT Architecture</button>
+                        <button class="ai-action-chip" onclick="window.sendAiQuery('Why hire you for an AI internship?')">🚀 Why Hire Prateek?</button>
+                        <button class="ai-action-chip" onclick="window.sendAiQuery('Give me advice for learning AI/ML')">💡 AI Student Advice</button>
+                        <button class="ai-action-chip primary-chip" onclick="window.triggerAiAction('openResume')">📄 View ATS Resume</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ai-chat-footer">
+            <form class="ai-chat-input-bar" id="aiChatForm" onsubmit="return false;">
+                <button type="button" class="ai-mic-btn" id="aiMicBtn" onclick="toggleAiMic()" title="Speak with Microphone" aria-label="Voice Input">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask me anything or tap mic to speak..." autocomplete="off">
+                <button type="submit" class="ai-send-btn" id="aiSendBtn" aria-label="Send Message" title="Send Query">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+            <div class="ai-input-hint">
+                <span><i class="fas fa-shield-alt"></i> Sandboxed &bull; Powered by Prateek Knowledge Base</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Scroll to Top Button -->
     <button class="back-to-top" id="backToTop" aria-label="Back to top">
         <i class="fas fa-chevron-up"></i>
@@ -1644,5 +1729,6 @@
     <!-- Scripts -->
     <script src="script.js?v=masterpiece-1.0"></script>
     <script src="new.js?v=masterpiece-1.0"></script>
+    <script src="chat.js?v=voice-1.0"></script>
 </body>
 </html>

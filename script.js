@@ -393,6 +393,16 @@ function initContactForm() {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+
+        // Security Anti-Spam Rate Limiting (60-second cooldown per client)
+        var lastSubmit = localStorage.getItem('prateek_contact_last_submit');
+        var now = Date.now();
+        if (lastSubmit && (now - parseInt(lastSubmit, 10)) < 60000) {
+            var waitSec = Math.ceil((60000 - (now - parseInt(lastSubmit, 10))) / 1000);
+            showToast('Anti-Spam Security: Please wait ' + waitSec + 's before submitting another message.');
+            return false;
+        }
+
         var nameEl = document.getElementById('senderName');
         var emailEl = document.getElementById('senderEmail');
         var subjectEl = document.getElementById('senderSubject');
@@ -432,6 +442,7 @@ function initContactForm() {
             return res.json();
         })
         .then(function(data) {
+            localStorage.setItem('prateek_contact_last_submit', Date.now().toString());
             showToast('Thank you ' + name + '! Your message has been sent directly to Prateek.');
             form.reset();
         })
