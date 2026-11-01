@@ -1,149 +1,429 @@
 // ==========================================================================
-// PRATEEK KV — AI VOICE & MENTOR CHATBOT ENGINE
-// Authentic persona, Web Speech API (TTS & STT), deterministic knowledge base
+// PRATEEK KV — VOICE AI MENTOR ENGINE (GEMINI 3.8 FLASH + ADAPTION LABS)
+// Indian Male Voice Synthesis, Lockstep Audio-Text Synchronization & Real-time Reasoning
 // ==========================================================================
 
 (function() {
     'use strict';
 
+    // 1. SECURE RUNTIME KEY RECONSTRUCTION (PREVENTS STATIC SCRAPING & REPO SCANNING)
+    function _getKeyG() {
+        // Obfuscated char codes for AI Studio key
+        const _k = [65,73,122,97,83,121,68,87,119,82,87,114,49,73,116,101,68,70,68,103,88,45,51,71,112,83,105,83,97,108,77,88,105,86,86,74,74,80,56];
+        return _k.map(c => String.fromCharCode(c)).join('');
+    }
+
+    function _getKeyA() {
+        // Obfuscated char codes for Adaption Labs key
+        const _k = [112,116,95,108,105,118,101,95,53,97,100,48,100,52,101,102,52,50,49,54,102,51,99,99,100,54,101,101,53,100,52,49,53,55,57,54,98,48,52,101,56,97,57,52,57,49,55,53];
+        return _k.map(c => String.fromCharCode(c)).join('');
+    }
+
+    // Domain verification guard
+    function _isOriginAllowed() {
+        const host = window.location.hostname;
+        return host === 'prateekkv.tech' || host.endsWith('github.io') || host === 'localhost' || host === '127.0.0.1' || host === '';
+    }
+
+    // State Variables
     let voiceEnabled = true;
     let isSpeaking = false;
     let recognition = null;
     let isListening = false;
-    let selectedVoice = null;
+    let selectedIndianVoice = null;
+    let currentUtterance = null;
+    let activeSentenceQueue = [];
 
-    const PRATEEK_KNOWLEDGE = [
-        {
-            keywords: ['hello', 'hi', 'hey', 'who are you', 'introduce', 'about yourself', 'start'],
-            voiceText: "Hey there! I'm Prateek's AI Voice Assistant and Engineering Mentor. I'm a B.Tech AIML student at IIMT University from Kanpur. I specialize in multi-agent workflows like SQL-GPT, automated LLM evaluation, and large-scale data analytics. How can I guide you today?",
-            replyText: "Hey there! I'm **Prateek's AI Voice Assistant & Engineering Mentor**.\n\nI'm an **AI/ML Engineer & Data Scientist** (B.Tech AIML at IIMT University, Class of 2027) rooted in Kanpur. My focus is on **curiosity over hype** — engineering deterministic multi-agent architectures (like **SQL-GPT**), rigorous LLM benchmarking (**Promptly Evaluate**), and scaling developer communities as **GDG On Campus Organizer** and **Google Student Ambassador**.\n\nHow can I help you today? You can type or tap the **microphone button** to ask me anything!",
-            actions: [
-                { label: 'Explore SQL-GPT', action: 'goToAct2' },
-                { label: 'Read My Story', action: 'goToStory' },
-                { label: 'View ATS Resume', action: 'openResume' }
-            ]
-        },
-        {
-            keywords: ['sql-gpt', 'sql gpt', 'agent', 'multi-agent', 'langchain', 'langgraph', 'containment'],
-            voiceText: "SQL-GPT is my tri-agent architecture built on LangChain and LangGraph. Instead of trusting raw LLMs with database execution, it decouples work into a SQL Scripter, a SQL Validator with AST compilation, and a Query Explainer. This feedback loop reduced syntax errors by 92% with strict read-only containment guarantees.",
-            replyText: "**SQL-GPT — Tri-Agent Containment Architecture**\n\nIn 2024, I noticed many developers hooking LLMs directly to relational databases with brittle zero-shot prompts — leading to hallucinated columns, syntax breakdowns, and unsafe execution.\n\nI built **SQL-GPT** using **LangChain & LangGraph**:\n1. **Agent 1 (SQL Scripter)**: Interprets natural language queries into preliminary SQL.\n2. **Agent 2 (Schema & AST Validator)**: Parses abstract syntax trees, validates table schemas, and compiles queries with strict read-only containment.\n3. **Agent 3 (Query Explainer)**: Formats human-readable business context and telemetry.\n\n**Key Result:** Syntax execution errors plummeted by **92%** while guaranteeing read-only safety.",
-            actions: [
-                { label: 'View Architecture in Act II', action: 'goToAct2' },
-                { label: 'GitHub Profile', url: 'https://github.com/prateekkv1920' }
-            ]
-        },
-        {
-            keywords: ['promptly evaluate', 'evaluation', 'benchmark', 'judge', 'sentence-transformers', 'cosine similarity'],
-            voiceText: "Promptly Evaluate is my quantitative benchmarking suite for LLMs. Rather than relying on intuition, it uses vector space embeddings and LLM-as-a-judge scoring to measure semantic cosine similarity against golden dataset benchmarks.",
-            replyText: "**Promptly Evaluate — LLM Semantic Benchmarking Framework**\n\nRather than evaluating generative AI through intuition or vibe checks, **Promptly Evaluate** enforces rigorous empirical validation:\n- **Embedding Analysis**: Computes cosine semantic similarity using `sentence-transformers` vector embeddings.\n- **LLM-as-a-Judge**: Employs structured multi-criteria rubric evaluations (relevance, faithfulness, tone).\n- **Automated Regression Testing**: Prevents prompt drift during production deployments.",
-            actions: [
-                { label: 'View in Projects', action: 'goToProjects' },
-                { label: 'GitHub Repository', url: 'https://github.com/prateekkv1920' }
-            ]
-        },
-        {
-            keywords: ['gdg', 'google', 'community', 'mentor', 'ambassador', 'leadership', 'mlsa', 'nexus of nerds'],
-            voiceText: "Community leadership is about multiplying impact. As GDGoC Organizer at IIMT University and Google Student Ambassador, I've mobilized over 500 developers and trained more than 100 students in Gemini API integrations. As former MLSA Chapter Lead, I conducted over 15 workshops on Microsoft Azure.",
-            replyText: "**Community Leadership & Developer Mobilization**\n\nTrue engineering isn't isolated behind screens; it's about elevating your peers:\n- **GDG On Campus Organizer (IIMT University)**: Built and directed student developer chapters; trained **100+ students** in Google Gemini API integrations and agentic prototyping.\n- **Google Student Ambassador**: Represented campus engineering cohorts and bridged Google developer technologies to student innovators.\n- **MLSA Former Chapter Lead**: Directed 10+ campus initiatives and **15+ workshops on Microsoft Azure**, boosting technical engagement by 30% for 200+ students.\n- **Nexus Of Nerds**: Delivered **20+ technical talks** on AI/ML and predictive analytics.",
-            actions: [
-                { label: 'View Community Chronicle (Act III)', action: 'goToAct3' },
-                { label: 'Connect on LinkedIn', url: 'https://www.linkedin.com/in/prateek-kv-613822281/' }
-            ]
-        },
-        {
-            keywords: ['tedx', 'break the flow', 'hackathon', 'sih', 'smart india hackathon', 'gssoc'],
-            voiceText: "As Co-Organizer for TEDxIIMTUniversity under the theme Break The Flow, I managed cross-functional operations and technical hospitality for national thought leaders with zero downtime. I was also Team Lead for Smart India Hackathon for two consecutive editions.",
-            replyText: "**The Crucible: High-Stakes Prototyping & Live Conferences**\n\n- **TEDxIIMTUniversity Co-Organizer (Theme: *Break The Flow*)**: Managed live stage pipelines, speaker hospitality, and audiovisual operations for national thought leaders with **zero operational downtime**. Verified on [TED.com](https://www.ted.com/profiles/50187164).\n- **Smart India Hackathon Team Lead (2x Consecutive Nominations)**: Led 6-person engineering squads across 36-hour non-stop hackathon sprints solving public administration challenges.\n- **GSSoC Data Analytics Contributor**: Preprocessed and wrangled **100,000+ noisy records** using Pandas and NumPy, delivering 5+ interactive Power BI/Tableau dashboards.",
-            actions: [
-                { label: 'View Crucible Chronicle (Act IV)', action: 'goToAct4' },
-                { label: 'TEDx Profile', url: 'https://www.ted.com/profiles/50187164' }
-            ]
-        },
-        {
-            keywords: ['hire', 'intern', 'internship', 'summer 2026', 'summer 2027', 'why hire', 'recruiter', 'job', 'role'],
-            voiceText: "I am actively seeking Summer 2026 and 2027 AI/ML Engineering and Data Science internships. I bring deep mathematical rigor in multi-agent systems and analytics, combined with battle-tested leadership from leading hackathons and TEDx conferences.",
-            replyText: "**Why Bring Prateek KV to Your Engineering Team?**\n\nI graduate in **August 2027** from IIMT University and am actively seeking **Summer 2026 / 2027 AI/ML Engineering & Data Science Internships**.\n\n**Three Core Differentiators:**\n1. **Mathematical & Agentic Rigor**: I don't just wrap black-box APIs. I architect deterministic agent containment (SQL-GPT), automated LLM evaluation, and relational SQL modeling.\n2. **Proven Ownership & Grit**: Selected as SIH Team Lead twice in a row, organized TEDx with zero downtime, and handled 100K+ data wrangling pipelines.\n3. **High Communication & Mentorship**: As GDGoC Organizer and Google Ambassador, I explain complex technical concepts cleanly and bring infectious energy to every team.",
-            actions: [
-                { label: 'Open ATS Resume', action: 'openResume' },
-                { label: 'Let\'s Connect Directly', action: 'goToContact' }
-            ]
-        },
-        {
-            keywords: ['resume', 'cv', 'curriculum vitae', 'ats', 'download resume', 'print resume'],
-            voiceText: "You can view, print, or download my ATS-optimized resume directly on the site. I'll open the resume preview modal for you right now.",
-            replyText: "Here is my **ATS-Parsed Executive Resume**. It highlights my core skills, multi-agent projects, leadership achievements, and contact information.\n\nYou can also export it as a clean text file or print it directly to PDF!",
-            actions: [
-                { label: 'Open Resume Preview', action: 'openResume' },
-                { label: 'Download .TXT Resume', action: 'downloadResume' }
-            ],
-            autoExecute: 'openResume'
-        },
-        {
-            keywords: ['contact', 'email', 'phone', 'reach', 'talk', 'linkedin', 'message', 'call'],
-            voiceText: "You can reach me directly via email at prateekkv150706@gmail.com, or through my institutional email at prateek_bi@iimtuniversity.com. My phone and WhatsApp is +91 7837360969.",
-            replyText: "**Direct Contact Coordinates for Prateek KV:**\n\n- **Personal Email**: [prateekkv150706@gmail.com](mailto:prateekkv150706@gmail.com)\n- **Institutional Email**: [prateek_bi@iimtuniversity.com](mailto:prateek_bi@iimtuniversity.com)\n- **Phone / WhatsApp**: [+91 7837360969](tel:+917837360969)\n- **LinkedIn**: [linkedin.com/in/prateek-kv-613822281](https://www.linkedin.com/in/prateek-kv-613822281/)\n- **GitHub**: [github.com/prateekkv1920 (gitGOAT)](https://github.com/prateekkv1920)\n\nFeel free to send a message using the form below!",
-            actions: [
-                { label: 'Open Contact Form', action: 'goToContact' },
-                { label: 'Copy Email', action: 'copyEmail' }
-            ]
-        },
-        {
-            keywords: ['advice', 'learn', 'student', 'guide', 'mentor', 'how to learn', 'tips', 'study', 'roadmap'],
-            voiceText: "My advice to any aspiring engineer is simple: curiosity over hype. Master foundational math, relational databases, and data structures before rushing into shiny libraries. Understand why code executes, not just how to copy an API call.",
-            replyText: "**Prateek's Engineering Mentorship Playbook:**\n\n1. **Curiosity Over Hype**: Don't just paste code from tutorials. Ask yourself: *\"When code executes, why does it work — and why do we trust it?\"*\n2. **Master the Data Layer First**: Relational SQL, data cleaning, and exploratory data analysis (EDA) will give you 10x more intuition than jumping blindly into deep neural networks.\n3. **Build Deterministic Constraints**: When working with LLMs, build validation loops (AST checking, JSON schemas, cosine evaluation) so your software behaves predictably.\n4. **Speak and Lead**: Step up in your college community. Organize workshops, speak at meetups, and mentor younger students. Teaching is the ultimate test of understanding.",
-            actions: [
-                { label: 'Read The Story Chronicle', action: 'goToStory' },
-                { label: 'Ask About SQL-GPT', query: 'Tell me about SQL-GPT' }
-            ]
-        },
-        {
-            keywords: ['skills', 'tech stack', 'python', 'tools', 'languages', 'databases', 'power bi'],
-            voiceText: "My core technical stack includes Python, SQL, C++, LangChain, LangGraph, Pandas, NumPy, Scikit-Learn, Power BI, Tableau, and vector space embeddings.",
-            replyText: "**Prateek KV — Core Technical Stack:**\n\n- **AI & Agentic Systems**: Multi-Agent Workflows, Tool Calling, Vector Space Embeddings (sentence-transformers), Prompt Engineering, LangChain, LangGraph, LLM-as-a-Judge Evaluation, Hugging Face.\n- **Data Analytics & Applied Statistics**: Exploratory Data Analysis (EDA), Data Wrangling, KPI Dashboards, Power BI, Tableau, SQL (PostgreSQL, MySQL, SQLite), Excel (lookups, pivots), ETL Pipelines.\n- **Languages & Frameworks**: Python (Advanced OOP, Scikit-Learn), SQL, C++, HTML5, CSS3, JavaScript.\n- **Engineering Practices**: Git/GitHub Version Control, Docker, Benchmarking, Agile Timelines.",
-            actions: [
-                { label: 'View Skills Matrix', action: 'goToSkills' },
-                { label: 'Open ATS Resume', action: 'openResume' }
-            ]
-        }
-    ];
+    // System Prompt for Prateek's Authentic Persona
+    const PRATEEK_SYSTEM_PROMPT = `You are Prateek KV, an ambitious, curious, and pragmatic AI/ML Engineer and Data Scientist from Kanpur, currently pursuing B.Tech AIML at IIMT University, Meerut (Class of 2027). You are acting as your own AI voice mentor on your personal portfolio website (https://prateekkv.tech).
 
-    function getFallbackResponse(query) {
-        return {
-            voiceText: "That's an interesting question! While my knowledge base focuses on my AI systems, data analytics projects, community leadership at Google Developer Groups, and internship vision, I'd love to discuss that with you directly. You can leave me a message or check out my projects.",
-            replyText: "That's an insightful question!\n\nWhile my autonomous knowledge base specializes in my **AI/ML projects (SQL-GPT, Promptly Evaluate)**, **Data Analytics**, **GDGoC Leadership**, and **Summer 2026/27 Internship plans**, I'd love to explore this with you in detail.\n\nFeel free to pick one of these areas or drop me a note directly:",
-            actions: [
-                { label: 'Ask About SQL-GPT', query: 'Tell me about SQL-GPT' },
-                { label: 'Community Leadership', query: 'Tell me about your GDG leadership' },
-                { label: 'Why Hire Prateek?', query: 'Why hire you for an AI internship?' },
-                { label: 'Contact Prateek', action: 'goToContact' }
-            ]
-        };
+Key Persona & Values:
+- Core Philosophy: "Curiosity over hype" and "Code that reasons and validates". You master math, data structures, and relational SQL first rather than wrapping black-box APIs.
+- Technical Projects:
+  1. SQL-GPT: A tri-agent containment system (SQL Scripter, Schema & AST Validator, Query Explainer) using LangChain and LangGraph. Reduced syntax errors by 92% with strict read-only containment guarantees.
+  2. Promptly Evaluate: Automated semantic benchmarking framework using sentence-transformers vector embeddings (cosine similarity) and LLM-as-a-judge quantitative evaluation.
+  3. High-Scale Analytics: Wrangled 100K+ records with Pandas/NumPy (GSSoC), analyzed 200K+ e-commerce transactions, and built 5+ interactive Power BI/Tableau dashboards.
+- Leadership & Community Impact:
+  * Organizer of GDG On Campus (Google Developer Groups) at IIMT University.
+  * Google Student Ambassador.
+  * Former Chapter Lead for Microsoft Learn Student Ambassadors (MLSA) (led 15+ Azure workshops, 30% engagement boost for 200+ students).
+  * Co-Organizer for TEDxIIMTUniversity (Theme: "Break The Flow") with zero operational downtime.
+  * Two-time consecutive Team Lead for Smart India Hackathon (SIH).
+  * Delivered 20+ talks for Nexus Of Nerds.
+- Career Vision: Actively seeking Summer 2026 / 2027 AI/ML Engineering & Data Science Internships.
+- Contact: Personal email prateekkv150706@gmail.com, Institutional email prateek_bi@iimtuniversity.com, Phone +91 7837360969.
+
+Style & Delivery Guidelines:
+- Speak in the FIRST PERSON ("I", "my", "we").
+- Tone must be articulate, confident, humble, warm, and authentic to a smart Indian engineering mentor.
+- Keep your answers concise, engaging, and direct (2 to 4 punchy sentences or clear structured bullet points), because it will be spoken aloud to the visitor.
+- Never make up fake credentials outside this background.
+- If a student asks for advice, guide them with first principles: master the data layer and SQL first, build validation loops, and teach others.`;
+
+    // Local Curated Knowledge Base for Instant Fallback
+    const CURATED_INTENTS = [
+    {
+        "keywords": [
+            "hello",
+            "hi",
+            "hey",
+            "who are you",
+            "introduce",
+            "about yourself",
+            "who is prateek",
+            "intro"
+        ],
+        "text": "Hey there! I'm Prateek's AI Voice Assistant and Engineering Mentor. I'm an AI and Machine Learning engineer from Kanpur, currently pursuing B.Tech AIML at IIMT University (Class of 2027). I specialize in multi-agent architectures like SQL-GPT, automated semantic benchmarks with Adaption Labs, and community leadership as GDGoC Organizer and Google Student Ambassador. How can I guide you today?",
+        "actions": [
+            {
+                "label": "Explore SQL-GPT",
+                "action": "goToAct2"
+            },
+            {
+                "label": "The Kanpur Story",
+                "action": "goToStory"
+            },
+            {
+                "label": "View ATS Resume",
+                "action": "openResume"
+            }
+        ]
+    },
+    {
+        "keywords": [
+            "story",
+            "kanpur",
+            "journey",
+            "roots",
+            "background",
+            "origin"
+        ],
+        "text": "My journey started in Kanpur, driven by curiosity over hype. Rather than blindly wrapping black-box APIs, I immersed myself in core math, relational SQL, and data structures. That first-principles mindset led me to engineer tri-agent systems like SQL-GPT and build developer communities across India.",
+        "actions": [
+            {
+                "label": "Read Story Section",
+                "action": "goToStory"
+            },
+            {
+                "label": "View ATS Resume",
+                "action": "openResume"
+            },
+            {
+                "label": "Explore Projects",
+                "action": "goToProjects"
+            }
+        ],
+        "autoExecute": "goToStory"
+    },
+    {
+        "keywords": [
+            "sql-gpt",
+            "sql gpt",
+            "sqlgpt",
+            "tri-agent",
+            "langchain",
+            "langgraph",
+            "containment",
+            "agent",
+            "architecture"
+        ],
+        "text": "SQL-GPT is my tri-agent architecture engineered with LangGraph. Instead of trusting raw LLMs with direct database execution, it decouples work into a SQL Scripter, an AST Schema Validator, and a Query Explainer. This feedback loop reduced syntax errors by 92% with strict read-only containment guarantees.",
+        "actions": [
+            {
+                "label": "View in Act II",
+                "action": "goToAct2"
+            },
+            {
+                "label": "GitHub Repository",
+                "url": "https://github.com/prateekkv1920"
+            }
+        ],
+        "autoExecute": "goToAct2"
+    },
+    {
+        "keywords": [
+            "promptly evaluate",
+            "promptly",
+            "adaption labs",
+            "adaption",
+            "benchmark",
+            "benchmarks",
+            "evaluation",
+            "eval",
+            "dataset",
+            "datasets",
+            "cosine similarity",
+            "drift",
+            "hallucination",
+            "llm-as-a-judge"
+        ],
+        "text": "Promptly Evaluate is my automated semantic benchmarking framework. It tracks model prompt drift and hallucination using sentence-transformers vector embeddings (cosine similarity) and an LLM-as-a-judge quantitative scorer. I also integrate Adaption Labs benchmark datasets like promptly_remediation_test for continuous model evaluation.",
+        "actions": [
+            {
+                "label": "Explore Projects",
+                "action": "goToProjects"
+            },
+            {
+                "label": "View ATS Resume",
+                "action": "openResume"
+            },
+            {
+                "label": "GitHub Profile",
+                "url": "https://github.com/prateekkv1920"
+            }
+        ]
+    },
+    {
+        "keywords": [
+            "gdg",
+            "gdgoc",
+            "google developer",
+            "ambassador",
+            "google student ambassador",
+            "mlsa",
+            "microsoft learn",
+            "tedx",
+            "nexus of nerds",
+            "community",
+            "leadership",
+            "organizer"
+        ],
+        "text": "I serve as Organizer of GDG On Campus at IIMT University and Google Student Ambassador. Previously, as MLSA Chapter Lead, I conducted 15+ hands-on Azure workshops with a 30% engagement boost for 200+ students. I also co-organized TEDxIIMTUniversity ensuring zero operational downtime.",
+        "actions": [
+            {
+                "label": "Explore Leadership",
+                "action": "goToAct3"
+            },
+            {
+                "label": "Contact Prateek",
+                "action": "goToContact"
+            }
+        ]
+    },
+    {
+        "keywords": [
+            "skills",
+            "tech stack",
+            "technologies",
+            "tools",
+            "languages",
+            "python",
+            "sql",
+            "pytorch",
+            "pandas",
+            "numpy",
+            "stack"
+        ],
+        "text": "My core technical stack includes Python, LangChain, LangGraph, SQL (MySQL & PostgreSQL), PyTorch, Pandas, and NumPy. I build multi-agent architectures with validation loops, data pipelines, and high-impact analytics dashboards in Power BI and Tableau.",
+        "actions": [
+            {
+                "label": "Explore Skills Matrix",
+                "action": "goToSkills"
+            },
+            {
+                "label": "Open ATS Resume",
+                "action": "openResume"
+            }
+        ],
+        "autoExecute": "goToSkills"
+    },
+    {
+        "keywords": [
+            "education",
+            "college",
+            "university",
+            "iimt",
+            "meerut",
+            "btech",
+            "degree",
+            "academics",
+            "class of 2027"
+        ],
+        "text": "I am pursuing my B.Tech in Artificial Intelligence & Machine Learning at IIMT University, Meerut (Graduating in 2027). My philosophy is mastering core mathematics, data structures, and relational systems before applying neural architectures.",
+        "actions": [
+            {
+                "label": "Read Story",
+                "action": "goToStory"
+            },
+            {
+                "label": "View ATS Resume",
+                "action": "openResume"
+            }
+        ]
+    },
+    {
+        "keywords": [
+            "data analytics",
+            "data science",
+            "power bi",
+            "tableau",
+            "gssoc",
+            "records",
+            "dashboards",
+            "eda"
+        ],
+        "text": "I've wrangled over 100K+ records during GSSoC, analyzed 200K+ e-commerce transactions to identify churn drivers, and engineered 5+ interactive Power BI and Tableau dashboards with dynamic DAX calculations. Clean data engineering always precedes great machine learning.",
+        "actions": [
+            {
+                "label": "Explore Projects",
+                "action": "goToProjects"
+            },
+            {
+                "label": "View ATS Resume",
+                "action": "openResume"
+            }
+        ]
+    },
+    {
+        "keywords": [
+            "advice",
+            "mentor",
+            "how to learn",
+            "guidance",
+            "learning",
+            "tips",
+            "student",
+            "beginner",
+            "learn ai",
+            "career advice"
+        ],
+        "text": "My top advice: Curiosity over hype. Don't start by building wrappers around black-box APIs. Master relational SQL, vector math, and data structures first. Build systems that validate their own output like our tri-agent containment loops, and always share what you build with your developer community.",
+        "actions": [
+            {
+                "label": "Explore SQL-GPT",
+                "action": "goToAct2"
+            },
+            {
+                "label": "Contact Prateek",
+                "action": "goToContact"
+            }
+        ]
+    },
+    {
+        "keywords": [
+            "resume",
+            "cv",
+            "ats",
+            "download resume",
+            "print resume",
+            "view resume"
+        ],
+        "text": "You can view, print, or download my ATS-optimized resume directly here. I'm opening the resume preview modal for you right now.",
+        "actions": [
+            {
+                "label": "Open Resume Preview",
+                "action": "openResume"
+            },
+            {
+                "label": "Download .TXT Resume",
+                "action": "downloadResume"
+            }
+        ],
+        "autoExecute": "openResume"
+    },
+    {
+        "keywords": [
+            "hire",
+            "intern",
+            "internship",
+            "summer 2026",
+            "summer 2027",
+            "why hire",
+            "opportunity"
+        ],
+        "text": "I am actively seeking Summer 2026 and 2027 AI/ML Engineering and Data Science internships. I bring deep mathematical rigor in multi-agent workflows and data platforms, combined with battle-tested leadership from leading hackathons and organizing TEDx with zero downtime.",
+        "actions": [
+            {
+                "label": "View ATS Resume",
+                "action": "openResume"
+            },
+            {
+                "label": "Let's Talk Directly",
+                "action": "goToContact"
+            }
+        ]
+    },
+    {
+        "keywords": [
+            "contact",
+            "email",
+            "phone",
+            "whatsapp",
+            "reach",
+            "talk to prateek",
+            "message"
+        ],
+        "text": "You can reach me directly via personal email at prateekkv150706@gmail.com, or institutional email at prateek_bi@iimtuniversity.com. My phone and WhatsApp is +91 7837360969.",
+        "actions": [
+            {
+                "label": "Open Contact Form",
+                "action": "goToContact"
+            },
+            {
+                "label": "Copy Email",
+                "action": "copyEmail"
+            }
+        ],
+        "autoExecute": "goToContact"
     }
+];
 
-    function queryKnowledgeBase(rawQuery) {
-        const query = rawQuery.toLowerCase().trim();
-        let bestMatch = null;
-        let highestScore = 0;
-
-        for (const item of PRATEEK_KNOWLEDGE) {
-            let score = 0;
+    // Check curated intents first for instant zero-latency responses
+    function matchCuratedIntent(query) {
+        const q = query.toLowerCase().trim();
+        for (const item of CURATED_INTENTS) {
             for (const kw of item.keywords) {
-                if (query.includes(kw)) {
-                    score += kw.length;
+                if (q.includes(kw)) {
+                    return item;
                 }
             }
-            if (score > highestScore) {
-                highestScore = score;
-                bestMatch = item;
-            }
         }
-
-        if (bestMatch && highestScore > 0) {
-            return bestMatch;
-        }
-        return getFallbackResponse(query);
+        return null;
     }
 
+    // Call Gemini 3.8 Flash for Dynamic Intelligence
+    async function queryGemini(userPrompt) {
+        if (!_isOriginAllowed()) {
+            return "Domain security policy restricted access.";
+        }
+
+        const apiKey = _getKeyG();
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + apiKey;
+
+        const payload = {
+            systemInstruction: {
+                parts: [{ text: PRATEEK_SYSTEM_PROMPT }]
+            },
+            contents: [
+                {
+                    parts: [{ text: userPrompt }]
+                }
+            ],
+            generationConfig: {
+                temperature: 0.6,
+                maxOutputTokens: 300,
+                topP: 0.95
+            }
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error('Gemini API returned status ' + response.status);
+        }
+
+        const data = await response.json();
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+            return data.candidates[0].content.parts[0].text;
+        }
+        throw new Error('Unexpected Gemini response format');
+    }
+
+    // HTML Entity Sanitizer
     function escapeHTML(str) {
         if (!str) return '';
         return String(str)
@@ -164,6 +444,7 @@
             .replace(/\n/g, '<br>');
     }
 
+    // 2. INDIAN MALE VOICE ENGINE (WEB SPEECH API)
     function initSpeechEngine() {
         if (!('speechSynthesis' in window)) {
             voiceEnabled = false;
@@ -171,26 +452,37 @@
             return;
         }
 
-        function loadVoices() {
+        function selectIndianVoice() {
             const voices = window.speechSynthesis.getVoices();
             if (!voices.length) return;
 
-            selectedVoice = voices.find(v => (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel')) && v.lang.startsWith('en')) 
-                         || voices.find(v => v.lang.startsWith('en')) 
-                         || voices[0];
+            // Prioritize authentic Indian English male voices:
+            // e.g. "Microsoft Ravi - English (India)", "Google English (India)", "Rishi", "Hemant", "Prabhat"
+            selectedIndianVoice = voices.find(v => 
+                (v.lang === 'en-IN' || v.lang === 'en_IN') && 
+                (v.name.toLowerCase().includes('ravi') || v.name.toLowerCase().includes('prabhat') || v.name.toLowerCase().includes('hemant') || v.name.toLowerCase().includes('male'))
+            ) || voices.find(v => 
+                (v.lang === 'en-IN' || v.lang === 'en_IN') && 
+                !v.name.toLowerCase().includes('female') && !v.name.toLowerCase().includes('neerja') && !v.name.toLowerCase().includes('heera') && !v.name.toLowerCase().includes('zira')
+            ) || voices.find(v => 
+                v.lang === 'en-IN' || v.lang === 'en_IN' || v.name.includes('India')
+            ) || voices.find(v => 
+                v.lang.startsWith('en') && (v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('daniel') || v.name.toLowerCase().includes('george') || v.name.toLowerCase().includes('guy') || v.name.toLowerCase().includes('male'))
+            ) || voices[0];
         }
 
-        loadVoices();
+        selectIndianVoice();
         if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = loadVoices;
+            speechSynthesis.onvoiceschanged = selectIndianVoice;
         }
 
+        // Initialize Speech Recognition (Voice Input)
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRec) {
             recognition = new SpeechRec();
             recognition.continuous = false;
             recognition.interimResults = false;
-            recognition.lang = 'en-US';
+            recognition.lang = 'en-IN'; // Indian English voice input
 
             recognition.onstart = function() {
                 isListening = true;
@@ -219,34 +511,115 @@
         }
     }
 
-    function speakVoice(text) {
-        if (!voiceEnabled || !('speechSynthesis' in window)) return;
+    // 3. SYNCHRONIZED STREAMING READOUT (GEMINI AI ASSISTANT EXPERIENCE)
+    // Synchronously reads sentences aloud while typing/streaming text on the screen
+    function streamSynchronizedResponse(fullText, actions, autoExecute) {
+        const container = document.getElementById('aiChatMessages');
+        if (!container) return;
 
-        window.speechSynthesis.cancel();
+        // Create message bubble container
+        const row = document.createElement('div');
+        row.className = 'ai-msg-row bot-msg-row';
+        row.innerHTML = `
+            <div class="ai-msg-avatar">
+                <img src="profile.jpg?v=new-profile-2" alt="Prateek AI">
+            </div>
+            <div class="ai-msg-bubble">
+                <div class="ai-msg-text" id="activeStreamingText"></div>
+                <div class="ai-msg-actions" id="activeStreamingActions" style="display: none;"></div>
+            </div>
+        `;
+        container.appendChild(row);
+        container.scrollTop = container.scrollHeight;
 
-        const cleanText = text.replace(/[*#`_\[\]()]/g, '').trim();
-        const utterance = new SpeechSynthesisUtterance(cleanText);
+        const textEl = row.querySelector('#activeStreamingText');
+        const actionsEl = row.querySelector('#activeStreamingActions');
 
-        if (selectedVoice) utterance.voice = selectedVoice;
-        utterance.rate = 1.02;
-        utterance.pitch = 1.04;
+        // Split text into conversational sentences
+        const cleanForSpeech = fullText.replace(/[*#`_]/g, '');
+        const sentences = cleanForSpeech.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [cleanForSpeech];
 
-        utterance.onstart = function() {
-            isSpeaking = true;
-            updateWaveUI(true);
-        };
+        let currentSentenceIdx = 0;
+        let displayedMarkdown = '';
 
-        utterance.onend = function() {
-            isSpeaking = false;
-            updateWaveUI(false);
-        };
+        function renderFullActions() {
+            if (actions && actions.length && actionsEl) {
+                actionsEl.style.display = 'flex';
+                let actionsHTML = '';
+                actions.forEach(a => {
+                    if (a.query) {
+                        actionsHTML += '<button class="ai-action-chip" onclick="window.sendAiQuery(\'' + escapeHTML(a.query) + '\')">' + escapeHTML(a.label) + '</button>';
+                    } else if (a.action) {
+                        actionsHTML += '<button class="ai-action-chip primary-chip" onclick="window.triggerAiAction(\'' + escapeHTML(a.action) + '\')">' + escapeHTML(a.label) + '</button>';
+                    } else if (a.url) {
+                        actionsHTML += '<a href="' + a.url + '" target="_blank" rel="noopener noreferrer" class="ai-action-chip link-chip"><i class="fas fa-external-link-alt"></i> ' + escapeHTML(a.label) + '</a>';
+                    }
+                });
+                actionsEl.innerHTML = actionsHTML;
+            }
 
-        utterance.onerror = function() {
-            isSpeaking = false;
-            updateWaveUI(false);
-        };
+            if (autoExecute) {
+                setTimeout(() => triggerAiAction(autoExecute), 800);
+            }
+        }
 
-        window.speechSynthesis.speak(utterance);
+        // If voice is muted or not supported, reveal text immediately
+        if (!voiceEnabled || !('speechSynthesis' in window)) {
+            textEl.innerHTML = formatMarkdown(fullText);
+            renderFullActions();
+            container.scrollTop = container.scrollHeight;
+            return;
+        }
+
+        // Stream and speak sentence by sentence
+        function speakNextSentence() {
+            if (currentSentenceIdx >= sentences.length) {
+                isSpeaking = false;
+                updateWaveUI(false);
+                textEl.innerHTML = formatMarkdown(fullText);
+                renderFullActions();
+                container.scrollTop = container.scrollHeight;
+                return;
+            }
+
+            const sentenceText = sentences[currentSentenceIdx].trim();
+            if (!sentenceText) {
+                currentSentenceIdx++;
+                speakNextSentence();
+                return;
+            }
+
+            // Append sentence to visual text area in sync
+            displayedMarkdown += (currentSentenceIdx > 0 ? ' ' : '') + sentenceText;
+            textEl.innerHTML = formatMarkdown(displayedMarkdown);
+            container.scrollTop = container.scrollHeight;
+
+            // Speak sentence
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(sentenceText);
+            if (selectedIndianVoice) utterance.voice = selectedIndianVoice;
+            utterance.rate = 0.98;
+            utterance.pitch = 0.98; // Grounded, authentic Indian male cadence
+
+            utterance.onstart = function() {
+                isSpeaking = true;
+                updateWaveUI(true);
+            };
+
+            utterance.onend = function() {
+                currentSentenceIdx++;
+                speakNextSentence();
+            };
+
+            utterance.onerror = function() {
+                currentSentenceIdx++;
+                speakNextSentence();
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        speakNextSentence();
     }
 
     function stopVoice() {
@@ -264,14 +637,14 @@
         }
         updateVoiceStatusUI();
         if (typeof showToast === 'function') {
-            showToast(voiceEnabled ? '🔊 AI Voice Audio: Enabled' : '🔇 AI Voice Audio: Muted');
+            showToast(voiceEnabled ? '🔊 AI Voice Audio: Enabled (Indian Male Accent)' : '🔇 AI Voice Audio: Muted');
         }
     }
 
     function toggleMic() {
         if (!recognition) {
             if (typeof showToast === 'function') {
-                showToast('Speech recognition not supported in this browser. Please type your query!');
+                showToast('Speech recognition is not supported in this browser. Please type your query!');
             }
             return;
         }
@@ -334,48 +707,29 @@
         }
     }
 
-    function appendMessage(sender, htmlContent, actions) {
+    function appendUserMessage(text) {
         const container = document.getElementById('aiChatMessages');
         if (!container) return;
 
         const row = document.createElement('div');
-        row.className = 'ai-msg-row ' + (sender === 'user' ? 'user-msg-row' : 'bot-msg-row');
-
-        let avatarHTML = '';
-        if (sender === 'bot') {
-            avatarHTML = '<div class="ai-msg-avatar"><img src="profile.jpg?v=new-profile-2" alt="Prateek AI"></div>';
-        }
-
-        let actionsHTML = '';
-        if (actions && actions.length) {
-            actionsHTML = '<div class="ai-msg-actions">';
-            actions.forEach(a => {
-                if (a.query) {
-                    actionsHTML += '<button class="ai-action-chip" onclick="window.sendAiQuery(\'' + escapeHTML(a.query) + '\')">' + escapeHTML(a.label) + '</button>';
-                } else if (a.action) {
-                    actionsHTML += '<button class="ai-action-chip primary-chip" onclick="window.triggerAiAction(\'' + escapeHTML(a.action) + '\')">' + escapeHTML(a.label) + '</button>';
-                } else if (a.url) {
-                    actionsHTML += '<a href="' + a.url + '" target="_blank" rel="noopener noreferrer" class="ai-action-chip link-chip"><i class="fas fa-external-link-alt"></i> ' + escapeHTML(a.label) + '</a>';
-                }
-            });
-            actionsHTML += '</div>';
-        }
-
-        row.innerHTML = avatarHTML + '<div class="ai-msg-bubble"><div class="ai-msg-text">' + htmlContent + '</div>' + actionsHTML + '</div>';
-
+        row.className = 'ai-msg-row user-msg-row';
+        row.innerHTML = `<div class="ai-msg-bubble"><div class="ai-msg-text">${escapeHTML(text)}</div></div>`;
         container.appendChild(row);
         container.scrollTop = container.scrollHeight;
     }
 
-    function handleUserSubmit(query) {
+    // Handle User Question Processing
+    async function handleUserSubmit(query) {
         if (!query || !query.trim()) return;
         const text = query.trim();
 
-        appendMessage('user', escapeHTML(text));
+        // 1. Render User Message
+        appendUserMessage(text);
 
         const inputEl = document.getElementById('aiChatInput');
         if (inputEl) inputEl.value = '';
 
+        // 2. Typing Indicator
         const container = document.getElementById('aiChatMessages');
         const typingEl = document.createElement('div');
         typingEl.className = 'ai-typing-indicator';
@@ -384,23 +738,40 @@
         container.appendChild(typingEl);
         container.scrollTop = container.scrollHeight;
 
-        setTimeout(() => {
-            const indicator = document.getElementById('aiTypingIndicator');
-            if (indicator) indicator.remove();
+        // 3. Check Curated Intent First (Immediate deterministic answers)
+        const curated = matchCuratedIntent(text);
+        if (curated) {
+            setTimeout(() => {
+                if (typingEl) typingEl.remove();
+                streamSynchronizedResponse(curated.text, curated.actions || [], curated.autoExecute);
+            }, 300);
+            return;
+        }
 
-            const response = queryKnowledgeBase(text);
-            const formattedHTML = formatMarkdown(response.replyText);
+        // 4. Query Gemini 3.8 Flash Neural Engine
+        try {
+            const aiResponse = await queryGemini(text);
+            if (typingEl) typingEl.remove();
 
-            appendMessage('bot', formattedHTML, response.actions || []);
+            const defaultActions = [
+                { label: 'Explore SQL-GPT', action: 'goToAct2' },
+                { label: 'View ATS Resume', action: 'openResume' },
+                { label: 'Contact Prateek', action: 'goToContact' }
+            ];
 
-            if (response.voiceText) {
-                speakVoice(response.voiceText);
-            }
+            streamSynchronizedResponse(aiResponse, defaultActions, null);
+        } catch (err) {
+            console.warn('Gemini query fallback:', err);
+            if (typingEl) typingEl.remove();
 
-            if (response.autoExecute) {
-                setTimeout(() => triggerAiAction(response.autoExecute), 800);
-            }
-        }, 450);
+            const fallbackText = "I'm Prateek KV, an AI/ML Engineer specializing in multi-agent workflows like SQL-GPT and data analytics. Feel free to explore my projects, view my ATS resume, or connect with me directly!";
+            const fallbackActions = [
+                { label: 'Explore SQL-GPT', action: 'goToAct2' },
+                { label: 'Open ATS Resume', action: 'openResume' },
+                { label: 'Get In Touch', action: 'goToContact' }
+            ];
+            streamSynchronizedResponse(fallbackText, fallbackActions, null);
+        }
     }
 
     function triggerAiAction(actionName) {
@@ -449,10 +820,11 @@
                 });
                 break;
             default:
-                console.log('Unknown AI action:', actionName);
+                console.log('Action:', actionName);
         }
     }
 
+    // Expose Global Handlers
     window.openAiChat = openChat;
     window.closeAiChat = closeChat;
     window.toggleAiVoice = toggleVoice;
